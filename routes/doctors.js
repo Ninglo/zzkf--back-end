@@ -15,7 +15,7 @@ router.get(
     function (req, res, next)
     {
         res.render(
-            'doctors',
+            'doctors.jade',
             {
                 title: 'Hello, World.',
                 name: 'JiaNian Jiu'
