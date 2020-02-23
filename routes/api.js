@@ -2,17 +2,6 @@ const express = require('express')
 const dbClient = require('../models/db')
 var router = express.Router()
 
-router.get('/', function(req, res) {
-    res.render(
-        'admin',
-        {
-        'statusCode': '200',
-        'userName': '', 
-        'gender': '', 
-        'disease': ''
-        })
-})
-
 /**
  *  /get/user_info: 查找用户功能，查找到后停留在补充了信息的admin页面。
  */
@@ -25,22 +14,23 @@ router.get('/get/user_info', function (req, res) {
             function(err, result) {
                 if (err) return console.log(err)
                 if (result == null) {
-                    res.render('admin', {'statusCode': '400'})
-                    return
+                    return {
+                        'statusCode': 400,
+                        'userName': '', 
+                        'gender': '', 
+                        'disease': ''
+                    }
                 }
                 var gender;
                 var disease;
                 typeof(result.gender) == "undefined" ? gender = '' : gender = result.gender
                 typeof(result.disease) == "undefined" ? disease = '' : disease = result.disease 
-                res.render(
-                    'admin', 
-                    {
-                        'statusCode': '200',
-                        'userName': userName, 
-                        'gender': gender, 
-                        'disease': disease
-                    }
-                )
+                return {
+                    'statusCode': 200,
+                    'userName': userName, 
+                    'gender': gender, 
+                    'disease': disease
+                }
             }
         )
 })

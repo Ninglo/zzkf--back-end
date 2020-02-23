@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="/stylesheets/style.css">
     <title>后台管理</title>
 </head>
-<script type="text/javascript" src="/javascripts/admin.js"></script>
 <body>
 
     <ul>
@@ -20,7 +19,7 @@
         <button>查找按钮</button>
     </form>
     <div id="userInfo">
-        <% if (statusCode == '200') {%>
+        <% if (statusCode == 200) {%>
             <% if (userName.length > 0) {%>
                 <p class="info">user_name: <%= userName %></p>
             <% } %>
@@ -49,4 +48,5 @@
     </form>
 
 </body>
+<script type="text/javascript" src="/javascripts/admin.js"></script>
 </html>
