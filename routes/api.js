@@ -55,10 +55,21 @@ router.post('/post/user_info', function (req, res) {
             if (err) return console.log(err)
             console.log('Have been saved to database.')
         })
-    res.send(`插入成功！ 
+    res.send(`success！ 
         userName is ${userName}, 
         gender is ${gender}, 
         disease is ${disease}.`)
+    return {
+        'statusCode': 200
+    }
 })
+
+/**
+ * eee
+ */
+router.post('/post/login', function (req, res) {
+    return {'statusCode': 200}
+})
+
 
 module.exports = router

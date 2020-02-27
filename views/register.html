@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/stylesheets/register.css">
+    <script type="text/javascript" src="/javascripts/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <title>注册</title>
+</head>
+<body>
+    <center>
+        <h1>注册</h1>
+        <div id="registerForm">
+            <div class="name">
+                姓名：<input name="name" v-model="userInfo.name">
+            </div>
+            <div class="account">
+                手机号：<input name="account" v-model="userInfo.account">
+            </div>
+            <div class="password">
+                密码：<input name="password" type="password" v-model="userInfo.password">
+            </div>
+            <div class="password">
+                再次输入密码：<input name="password2" type="password" v-model="userInfo.password2">
+                <span>{{ tip }}</span>
+            </div>
+            <button class="registerButton" v-on:click="register">注册</button>
+        <div>
+    </center>
+</body>
+<script src="/javascripts/register.js"></script>
+</html>
