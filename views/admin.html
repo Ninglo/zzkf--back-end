@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="Keywords" content="">
+    <meta name="Description" content="">
+    <link rel="stylesheet" href="/stylesheets/admin.css">
+    <script type="text/javascript" src="/javascripts/vue.js"></script>
+    <title>后台管理</title>
+</head>
+<body>
+    <div class="wrap">
+        <div class="header">后台管理</div>
+        <div id="nav">
+            <ul>
+                <li class="list" v-for="(value, key, i) in list">
+                    <h2><i></i>{{ key }}</h2>
+                    <div class="hide">
+                        <h5 v-for="(v, j) in value" @click="show(String(i+1) + String(j+1))">{{ v }}</h5>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="body">
+        <form v-if="seen" id="findForm" action="/api/get/user_info" method="get">
+            <input name="user_name" placeholder="请输入患者的姓名" />
+            <button>查找按钮</button>
+            <br/>
+            <div class="userInfo">
+                <p v-for="(key, value) in info" v-if="key.length" class="info">{{ value }}: {{ key }}</p>
+                <p v-if="!info.name" id="noFoundTip" class="info">未查找到！</p>
+            </div>
+        </form>
+
+        <form v-if="seen" id="insertForm" action="/api/post/user_info" method="post">
+            <div>
+                <span>姓名：</span><input name="user_name" />
+            </div>
+            <div>
+                <span>性别：</span><input name="gender" />
+            </div>
+            <div>
+                <span>所患疾病：</span><input name="disease" />
+            </div>
+            <button>添加按钮</button>
+        </form>
+    </div>
+</body>
+<script type="text/javascript" src="/javascripts/admin.js"></script>
+</html>
