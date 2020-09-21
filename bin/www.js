@@ -1,7 +1,6 @@
 var app = require('../app');
 var debug = require('debug')('ylkf-backend:server');
 var http = require('http');
-
 /**
  * Get port from environment and store in Express.
  */
@@ -9,6 +8,12 @@ var http = require('http');
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
+/*
+const options = {
+  pfx: fs.readFileSync(path.join(__dirname, 'public','www.ninglo.xyz.pfx')),
+  passphrase: '243g878ex5f7z9g'
+}
+*/
 var server = http.createServer(app);
 
 /**

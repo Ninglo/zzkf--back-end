@@ -6,21 +6,25 @@ const { MongoClient } = require("mongodb")
 const URI = 'mongodb://localhost:27017/'
 const client = new MongoClient(URI)
 
+const axios = require('axios')
+
 var dataBase
 var userInfoCollection
 client.connect().then(() => {
     dataBase = client.db("zzkf")
     userInfoCollection = dataBase.collection('userInfo')
+    courseCollection = dataBase.collection('course')
 })
 
 router.use(bodyParser.urlencoded({ extended: false }))
 router.use(bodyParser.json())
 
 // userInfo
-router.get('/userInfo', (req, res) => {
-    userId = req.query.userId
-    console.log(`A GET request with ${userId}`)
-    queryUserInfo(userId, res).catch(console.dir)
+router.get('/userInfo/:code', async (req, res) => {
+    code = req.params.code
+    console.log(`A GET request with ${code}`)
+    const resData = await axios.get(`https://api.weixin.qq.com/sns/jscode2session?appid=wxf0d502c6da70bdbc&secret=bf6390fd750abce0cb8d3bcb84a145d1&js_code=${code}&grant_type=authorization_code`)
+    await queryUserInfo(resData, res).catch(console.dir)
 })
 
 router.put('/userInfo', (req, res) => {
@@ -38,8 +42,8 @@ router.delete('/userInfo', (req, res) => {
 
 
 // couseInfo
-router.get('/courseInfo', (req, res) => {
-    let courseId = req.query.courseid
+router.get('/courseInfo/:courseId', (req, res) => {
+    let courseId = req.params.courseId
     queryCourseInfo(courseId, res).catch(console.dir)
 })
 
@@ -61,33 +65,33 @@ router.get('/courseList', (req, res) => {
 })
 
 
-async function queryUserInfo(userId, res) {
-    const query = { userId: userId }
-    console.log(`Begin a query with:`)
-    console.log(query)
-
+async function queryUserInfo(resData, res) {
+    const query = { openid: resData.data.openid }
     const userInfoObj = await userInfoCollection.findOne(query)
-    console.log(`Get userInfoObj.`)
-
-    await res.send(userInfoObj)
-    console.log('Send Success!')
+    if (!userInfoObj) {
+        const newUserInfoObj = {
+            openid: resData.data.openid,
+            session_key: resData.data.session_key,
+            courses: [],
+        }
+        userInfoCollection.insertOne(newUserInfoObj)
+        await res.send(userInfoObj)
+    } else {
+        await res.send(userInfoObj)
+    }
 }
 
 async function updateUserInfo(userInfoObj, res) {
-    let status = false
-    const filter = { userId : userInfoObj.userId }
+    const filter = { openid : userInfoObj.openid }
+    console.log(userInfoObj)
+    const update = {
+        $set: { courses: userInfoObj.courses }
+    }
     const options = { upsert: true }
 
-    await userInfoCollection.updateOne(filter, { $set: userInfoObj }, options)
+    await userInfoCollection.updateOne(filter, update, options)
 
-    status = true
-    if (status) {
-        res.sendStatus(200)
-        res.send('Update db finished.')
-    } else {
-        res.sendStatus(400)
-        res.send('Update db Wrong.')
-    }
+    res.send('Finished.')
 }
 
 async function deleteUserInfo(userId, res) {
@@ -107,32 +111,21 @@ async function deleteUserInfo(userId, res) {
 }
 
 async function queryCourseInfo(courseId, res) {
-    try {
-        client.connect()
-
-        const dataBase = client.db('zzkf')
-        const collection = dataBase.collection('courseInfo')
-
-        const query = { courseId: courseId }
-        res.send(await collection.findOne(query))
-    } finally {
-        await client.close()
-    }
+    const query = { courseId: parseInt(courseId) }
+    const course = await courseCollection.findOne(query)
+    res.send(course)
 }
 
-async function queryCourseList(difficulty, res) {
-    try {
-        client.connect()
-
-        const dataBase = client.db('zzkf')
-        const collection = dataBase.collection('courseInfo')
-
-        const query = { difficulty: difficulty }
-
-        res.send(await collection.find(query))
-    } finally {
-        await client.close()
+async function queryCourseList(res) {
+    const fields = {
+        _id: false,
+        courseName: true,
+        courseId: true,
+        'detail.intro': true,
     }
+    const courseList = await courseCollection.find({}).project(fields).toArray()
+    console.log(courseList)
+    res.send(courseList)
 }
 
 module.exports = router
